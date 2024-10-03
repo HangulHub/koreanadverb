@@ -1,0 +1,497 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean Adverb Conjugation</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #presentation {
+            width: 90%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        .slide.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        p {
+            color: #333;
+            line-height: 1.6;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(76,175,80,0.5);
+        }
+        .example {
+            background-color: #FFEB3B;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .example:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .popup-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            animation: popupAppear 0.5s;
+        }
+        @keyframes popupAppear {
+            from {opacity: 0; transform: scale(0.8);}
+            to {opacity: 1; transform: scale(1);}
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+        #exercise {
+            margin-top: 20px;
+        }
+        #exercise input {
+            margin: 10px 0;
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        #exercise input:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 5px rgba(76,175,80,0.5);
+            outline: none;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .highlight {
+            background-color: #FFEB3B;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .info-box {
+            background-color: #E8F5E9;
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .info-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(76,175,80,0.3);
+        }
+        .korean {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 500;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            margin-top: 20px;
+        }
+        .progress {
+            width: 0;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.5s ease-in-out;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .flash-card {
+            perspective: 1000px;
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+        }
+        .flash-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flash-card:hover .flash-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flash-card-front, .flash-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .flash-card-front {
+            background-color: #f1f8e9;
+            color: #333;
+        }
+        .flash-card-back {
+            background-color: #4CAF50;
+            color: white;
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="presentation">
+        <div class="slide active">
+            <h1>Korean Adverb Conjugation</h1>
+            <p>Welcome to this interactive presentation on Korean adverb conjugation. We'll explore how to form and use adverbs in Korean.</p>
+            <div class="flash-card">
+                <div class="flash-card-inner">
+                    <div class="flash-card-front">
+                        <p class="korean">부사 (busa)</p>
+                    </div>
+                    <div class="flash-card-back">
+                        <p>Adverb</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(1)">시작 (Start)</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>What are Adverbs?</h1>
+            <p>Adverbs in Korean, like in English, modify verbs, adjectives, or other adverbs. They describe how an action is performed.</p>
+            <div class="info-box">
+                <p>In Korean, many adverbs are derived from adjectives, but some are standalone words.</p>
+            </div>
+            <div class="example">
+                <p class="korean">빨리 달리다 (ppalli dallida)</p>
+                <p>To run quickly</p>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Basic Rules</h1>
+            <p>The basic rule for converting an adjective to an adverb is:</p>
+            <div class="info-box">
+                <p>Remove '다' (da) from the adjective and add '게' (ge)</p>
+            </div>
+            <p>Example: <span class="highlight korean">빠르다</span> (ppareuda - fast) → <span class="highlight korean">빠르게</span> (ppareuge - quickly)</p>
+            <div class="example">
+                <p class="korean">그는 빠르게 달립니다.</p>
+                <p>He runs quickly.</p>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Exceptions</h1>
+            <p>There are some exceptions to this rule:</p>
+            <ol>
+                <li>Adjectives ending in '하다' (hada) → Replace '하다' with '히' (hi)</li>
+                <li>Some common adverbs have irregular forms</li>
+                <li>Some adverbs are standalone words and don't derive from adjectives</li>
+            </ol>
+            <p>Click for examples:</p>
+            <button onclick="showPopup('exception-examples')">Show Examples</button>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Usage</h1>
+            <p>Adverbs in Korean typically come before the verb they modify:</p>
+            <div class="example">
+                <p class="korean">빨리 걷다</p>
+                <p>(ppalli geotda - to walk quickly)</p>
+            </div>
+            <p>They can also modify adjectives or other adverbs:</p>
+            <div class="example">
+                <p class="korean">매우 크다</p>
+                <p>(maeu keuda - very big)</p>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Types of Adverbs</h1>
+            <p>Korean adverbs can be categorized into several types:</p>
+            <ul>
+                <li>Manner adverbs (how): <span class="korean tooltip">천천히<span class="tooltiptext">cheoncheonhi - slowly</span></span></li>
+                <li>Time adverbs: <span class="korean tooltip">지금<span class="tooltiptext">jigeum - now</span></span></li>
+                <li>Frequency adverbs: <span class="korean tooltip">자주<span class="tooltiptext">jaju - often</span></span></li>
+                <li>Degree adverbs: <span class="korean tooltip">매우<span class="tooltiptext">maeu - very</span></span></li>
+            </ul>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Adverb Placement</h1>
+            <p>The general rule for adverb placement in Korean is:</p>
+            <div class="info-box">
+                <p>Subject + Time Expression + Adverb + Object + Verb</p>
+            </div>
+            <div class="example">
+                <p class="korean">나는 어제 빨리 숙제를 했어요.</p>
+                <p>(I quickly did my homework yesterday.)</p>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Practice Exercise</h1>
+            <p>Convert the following adjectives to adverbs:</p>
+            <div id="exercise">
+                <input type="text" id="answer1" placeholder="쉽다 (easy)">
+                <input type="text" id="answer2" placeholder="조용하다 (quiet)">
+                <input type="text" id="answer3" placeholder="느리다 (slow)">
+                <button onclick="checkAnswers()">Check Answers</button>
+            </div>
+            <div id="result"></div>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Common Adverbs</h1>
+            <p>Here are some common Korean adverbs:</p>
+            <ul>
+                <li><span class="korean tooltip">아주<span class="tooltiptext">aju - very</span></span></li>
+                <li><span class="korean tooltip">잘<span class="tooltiptext">jal - well</span></span></li>
+                <li><span class="korean tooltip">빨리<span class="tooltiptext">ppalli - quickly</span></span></li>
+                <li><span class="korean tooltip">천천히<span class="tooltiptext">cheoncheonhi - slowly</span></span></li>
+                <li><span class="korean tooltip">항상<span class="tooltiptext">hangsang - always</span></span></li>
+            </ul>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Conclusion</h1>
+            <p>Congratulations! You've completed the presentation on Korean adverb conjugation.</p>
+            <p>Remember the basic rule: Remove '다' and add '게', but watch out for exceptions!</p>
+            <p>Practice regularly to improve your skills in using Korean adverbs.</p>
+            <div class="nav-buttons">
+                <button onclick="changeSlide(-1)">Previous</button>
+                <button onclick="restartPresentation()">Restart</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <div id="exception-examples" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('exception-examples')">×</span>
+            <h2>Exception Examples</h2>
+            <p>1. Adjectives ending in '하다' (hada):</p>
+            <ul>
+                <li><span class="korean">조용하다</span> (joyonghada - quiet) → <span class="korean">조용히</span> (joyonghi - quietly)</li>
+                <li><span class="korean">자연스럽다</span> (jayeonseureopda - natural) → <span class="korean">자연스럽게</span> (jayeonseureopge - naturally)</li>
+            </ul>
+            <p>2. Irregular forms:</p>
+            <ul>
+                <li><span class="korean">좋다</span> (jota - good) → <span class="korean">잘</span> (jal - well)</li>
+                <li><span class="korean">많다</span> (manta - many) → <span class="korean">많이</span> (mani - much)</li>
+            </ul>
+            <p>3. Standalone adverbs:</p>
+            <ul>
+                <li><span class="korean">가끔</span> (gakkeum - sometimes)</li>
+                <li><span class="korean">벌써</span> (beolsseo - already)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide >= slides.length) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = slides.length - 1;
+            }
+            slides[currentSlide].classList.add('active');
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = document.getElementById('progress');
+            const percentage = ((currentSlide + 1) / slides.length) * 100;
+            progress.style.width = percentage + '%';
+        }
+
+        function showPopup(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closePopup(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function checkAnswers() {
+            const answers = ['쉽게', '조용히', '느리게'];
+            const userAnswers = [
+                document.getElementById('answer1').value,
+                document.getElementById('answer2').value,
+                document.getElementById('answer3').value
+            ];
+            let correct = 0;
+            for (let i = 0; i < answers.length; i++) {
+                if (userAnswers[i] === answers[i]) {
+                    correct++;
+                }
+            }
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `You got ${correct} out of 3 correct!`;
+            resultElement.style.opacity = '1';
+        }
+
+        function restartPresentation() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = 0;
+            slides[currentSlide].classList.add('active');
+            updateProgressBar();
+        }
+
+        // Close popup when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.className === 'popup') {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Initialize progress bar
+        updateProgressBar();
+    </script>
+
+
+</body></html>
